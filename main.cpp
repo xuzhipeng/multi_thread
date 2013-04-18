@@ -1,6 +1,6 @@
 #include <stdio.h>
 //#include <stdlib.h>
-//#include <unistd.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
 
@@ -126,6 +126,7 @@ void* thread_function_sem(void* arg)
     printf("Child thread finished\n");
 }
 
+//生产桔子
 void* thread_function_father(void* arg)
 {
     while (true)
@@ -133,9 +134,11 @@ void* thread_function_father(void* arg)
         sem_wait(&sem_blank);
         printf("Father put an orange\n");
         sem_post(&sem_orange);
+        sleep(1);
     }
 }
 
+//生产苹果
 void* thread_function_mother(void* arg)
 {
     while (true)
@@ -143,9 +146,11 @@ void* thread_function_mother(void* arg)
         sem_wait(&sem_blank);
         printf("Mother put an apple\n");
         sem_post(&sem_apple);
+        sleep(1);
     }
 }
 
+//吃桔子
 void* thread_function_son1(void* arg)
 {
     while (true)
@@ -153,9 +158,11 @@ void* thread_function_son1(void* arg)
         sem_wait(&sem_orange);
         printf("Son1 get an orange\n");
         sem_post(&sem_blank);
+        sleep(1);
     }
 }
 
+//吃桔子
 void* thread_function_son2(void* arg)
 {
     while (true)
@@ -163,9 +170,11 @@ void* thread_function_son2(void* arg)
         sem_wait(&sem_orange);
         printf("Son2 get an orange\n");
         sem_post(&sem_blank);
+        sleep(1);
     }
 }
 
+//吃苹果
 void* thread_function_daughter(void* arg)
 {
     while (true)
@@ -173,6 +182,7 @@ void* thread_function_daughter(void* arg)
         sem_wait(&sem_apple);
         printf("Daughter get an apple\n");
         sem_post(&sem_blank);
+        sleep(1);
     }
 }
 
