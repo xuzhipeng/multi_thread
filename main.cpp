@@ -13,6 +13,9 @@ void* thread_function_son1(void* arg);
 void* thread_function_son2(void* arg);
 void* thread_function_daughter(void* arg);
 
+//void multi_quick_sort(int a[], int low, int high);
+void* multi_quick_sort(void* arg);
+
 int g_counter = 0;
 
 pthread_mutex_t work_mutex;
@@ -64,7 +67,8 @@ int main(int argc, char* argv[])
     
     sem_destroy(&bin_sem);//用完以后销毁
 #endif
-    
+
+#if 0    
     sem_init(&sem_blank, 0, 1);
     sem_init(&sem_orange, 0, 0);
     sem_init(&sem_apple, 0, 0);
@@ -92,7 +96,23 @@ int main(int argc, char* argv[])
     sem_destroy(&sem_blank);
     sem_destroy(&sem_orange);
     sem_destroy(&sem_apple);
+#endif
+
+    int a[12] = {45, 0, 23, 3, 4, 21, 89, 33, 21, 47, 83, 1};
+    int low = 0;
+    int high = sizeof(a) / sizeof(int);
+    void* para[3] = {(void*)a, &low, &high};
     
+    pthread_t sort;
+    pthread_create(&sort, NULL, multi_quick_sort, para);
+    pthread_join(sort, NULL);
+    
+    for (int i = 0; i < sizeof(a) / sizeof(int); i++)
+    {
+        printf("%d\n", a[i]);
+    }
+    
+    printf("Main thread finished\n");
     return 0;
 }
 
@@ -185,4 +205,73 @@ void* thread_function_daughter(void* arg)
         sleep(1);
     }
 }
+
+int partition(int a[], int low, int high)
+{
+    printf("low is: %d;high is: %d\n", low ,high);
+    
+	int tmp = a[low];
+
+	while (low < high)
+	{
+		while (low < high && a[high] >= tmp)
+		{
+			high--;
+		}
+		a[low] = a[high];
+
+		while (low < high && a[low] <= tmp)
+		{
+			low++;
+		}
+		a[high] = a[low];
+	}
+
+	a[low] = tmp;
+	return low;
+}
+
+void quick_sort(int a[], int low, int high)
+{
+    printf("low is: %d;high is: %d\n", low ,high);
+	if (low < high)
+	{
+		int pos = partition(a, low, high);
+		printf("pos is: %d\n", pos);
+		quick_sort(a, low, pos - 1);
+		quick_sort(a, pos + 1, high);
+	}
+}
+
+void* multi_quick_sort(void* arg)
+{
+    //int* a = (int*)arg[0];
+    //int low = (int)*arg[1];
+    //int high = (int)*arg[2];
+    
+    int* a = (int*)((void**)arg)[0];
+    int low = *(int*)((void**)arg)[1];
+    int high = *(int*)((void**)arg)[2];
+    
+    
+	if (low < high)
+	{
+		int pos = partition(a, low, high);
+		int pos1 = pos - 1;
+		int pos2 = pos + 1;
+		
+		pthread_t low_part;
+        pthread_t high_part;
+        
+        void* low_para[3] = {(void*)a, &low, &pos1};
+        void* high_para[3] = {(void*)a, &pos2, &high};
+        pthread_create(&low_part, NULL, multi_quick_sort, low_para);
+        pthread_join(low_part, NULL);
+        
+        pthread_create(&high_part, NULL, multi_quick_sort, high_para);
+        pthread_join(high_part, NULL);
+	}
+}
+
+
 
