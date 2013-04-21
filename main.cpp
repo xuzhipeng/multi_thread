@@ -100,13 +100,20 @@ int main(int argc, char* argv[])
 
     int a[12] = {45, 0, 23, 3, 4, 21, 89, 33, 21, 47, 83, 1};
     int low = 0;
-    int high = sizeof(a) / sizeof(int);
+    int high = sizeof(a) / sizeof(int) - 1;
     void* para[3] = {(void*)a, &low, &high};
+    
+    printf("Before sort:\n");
+    for (int i = 0; i < sizeof(a) / sizeof(int); i++)
+    {
+        printf("%d\n", a[i]);
+    }
     
     pthread_t sort;
     pthread_create(&sort, NULL, multi_quick_sort, para);
     pthread_join(sort, NULL);
     
+    printf("After sort:\n");
     for (int i = 0; i < sizeof(a) / sizeof(int); i++)
     {
         printf("%d\n", a[i]);
@@ -231,6 +238,7 @@ int partition(int a[], int low, int high)
 	return low;
 }
 
+/*
 void quick_sort(int a[], int low, int high)
 {
     printf("low is: %d;high is: %d\n", low ,high);
@@ -242,6 +250,7 @@ void quick_sort(int a[], int low, int high)
 		quick_sort(a, pos + 1, high);
 	}
 }
+*/
 
 void* multi_quick_sort(void* arg)
 {
